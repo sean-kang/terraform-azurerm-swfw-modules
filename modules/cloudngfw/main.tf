@@ -66,6 +66,14 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rules
       }
     }
   }
+
+  dynamic "dns_settings" {
+    for_each = var.cloudngfw_config.dns_settings != null ? [var.cloudngfw_config.dns_settings] : []
+    content {
+      dns_servers   = dns_settings.value.dns_servers
+      use_azure_dns = dns_settings.value.use_azure_dns
+    }
+  }
 }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/palo_alto_next_generation_firewall_virtual_network_panorama
@@ -116,6 +124,14 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
       }
     }
   }
+
+  dynamic "dns_settings" {
+    for_each = var.cloudngfw_config.dns_settings != null ? [var.cloudngfw_config.dns_settings] : []
+    content {
+      dns_servers   = dns_settings.value.dns_servers
+      use_azure_dns = dns_settings.value.use_azure_dns
+    }
+  }
 }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/palo_alto_next_generation_firewall_virtual_network_strata_cloud_manager
@@ -164,6 +180,14 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_strata_clou
         port              = destination_nat.value.backend_port
         public_ip_address = destination_nat.value.backend_ip_address
       }
+    }
+  }
+
+  dynamic "dns_settings" {
+    for_each = var.cloudngfw_config.dns_settings != null ? [var.cloudngfw_config.dns_settings] : []
+    content {
+      dns_servers   = dns_settings.value.dns_servers
+      use_azure_dns = dns_settings.value.use_azure_dns
     }
   }
 }
@@ -220,6 +244,14 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_local_rulestack
       }
     }
   }
+
+  dynamic "dns_settings" {
+    for_each = var.cloudngfw_config.dns_settings != null ? [var.cloudngfw_config.dns_settings] : []
+    content {
+      dns_servers   = dns_settings.value.dns_servers
+      use_azure_dns = dns_settings.value.use_azure_dns
+    }
+  }
 }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/palo_alto_next_generation_firewall_vhub_panorama
@@ -267,6 +299,14 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama" "this
       }
     }
   }
+
+  dynamic "dns_settings" {
+    for_each = var.cloudngfw_config.dns_settings != null ? [var.cloudngfw_config.dns_settings] : []
+    content {
+      dns_servers   = dns_settings.value.dns_servers
+      use_azure_dns = dns_settings.value.use_azure_dns
+    }
+  }
 }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/palo_alto_next_generation_firewall_virtual_hub_strata_cloud_manager
@@ -312,6 +352,14 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_strata_cloud_ma
         port              = destination_nat.value.backend_port
         public_ip_address = destination_nat.value.backend_ip_address
       }
+    }
+  }
+
+  dynamic "dns_settings" {
+    for_each = var.cloudngfw_config.dns_settings != null ? [var.cloudngfw_config.dns_settings] : []
+    content {
+      dns_servers   = dns_settings.value.dns_servers
+      use_azure_dns = dns_settings.value.use_azure_dns
     }
   }
 }

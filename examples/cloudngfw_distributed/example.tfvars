@@ -35,6 +35,16 @@ cloudngfws = {
     management_mode      = "panorama"
     cloudngfw_config = {
       panorama_base64_config = "eyJkZ25hbWUiOiAiY25nZnctYXotZXhhbXBsZSIsICJ0cGxuYW1lIjogImNuZ2Z3LWF6LWV4YW1wbGUiLCAicGFub3JhbWEtc2VydmVyIjogIjEuMS4xLjEiLCAidm0tYXV0aC1rZXkiOiAiMTExMTExMTExMTExMTExIiwgInBhbm9yYW1hLXNlcmlhbCI6ICIxMTExMTExMTExMTEiLCAicGFub3JhbWEtdmVyc2lvbiI6ICIxMS4yLjgiLCAiYXp1cmUtcGx1Z2luLXZlcnNpb24iOiAiNS4yLjMiLCAiZXhwaXJ5IjogIjI5OTkvMDEvMDEifQ==" # TODO: Put panorama base64 connection string
+      /* Optional dns_settings examples:
+      # Option 1 — custom DNS servers
+      dns_settings = {
+        dns_servers = ["10.0.0.4", "10.0.0.5"]
+      }
+      # Option 2 — Azure-provided DNS
+      dns_settings = {
+        use_azure_dns = true
+      }
+      */
       destination_nats = {
         "app1-tcp80-dnat" = {
           destination_nat_name     = "app1-tcp80-dnat"
@@ -62,6 +72,16 @@ cloudngfws = {
     management_mode      = "panorama"
     cloudngfw_config = {
       panorama_base64_config = "eyJkZ25hbWUiOiAiY25nZnctYXotZXhhbXBsZSIsICJ0cGxuYW1lIjogImNuZ2Z3LWF6LWV4YW1wbGUiLCAicGFub3JhbWEtc2VydmVyIjogIjEuMS4xLjEiLCAidm0tYXV0aC1rZXkiOiAiMTExMTExMTExMTExMTExIiwgInBhbm9yYW1hLXNlcmlhbCI6ICIxMTExMTExMTExMTEiLCAicGFub3JhbWEtdmVyc2lvbiI6ICIxMS4yLjgiLCAiYXp1cmUtcGx1Z2luLXZlcnNpb24iOiAiNS4yLjMiLCAiZXhwaXJ5IjogIjI5OTkvMDEvMDEifQ==" # TODO: Put panorama base64 connection string
+      /* Optional dns_settings examples:
+      # Option 1 — custom DNS servers
+      dns_settings = {
+        dns_servers = ["10.0.0.4", "10.0.0.5"]
+      }
+      # Option 2 — Azure-provided DNS
+      dns_settings = {
+        use_azure_dns = true
+      }
+      */
       destination_nats = {
         "app2-tcp80-dnat" = {
           destination_nat_name     = "app2-tcp80-dnat"

@@ -104,25 +104,35 @@ variable "cloudngfw_config" {
                                         This field is required when `management_mode` is set to `panorama`.
   - `strata_cloud_manager_tenant_name` - (`string`, optional) the Strata Cloud Manager tenant name used to manage the policy
                                         for this firewall. This field is required when `management_mode` is set to `scm`.
-  - `create_public_ip`                - (`bool`, optional, defaults to `true`) controls if the Public IP resource is created or 
+  - `create_public_ip`                - (`bool`, optional, defaults to `true`) controls if the Public IP resource is created or
                                         sourced. This field is ignored when the variable `public_ip_ids` is used.
-  - `public_ip_name`                  - (`string`, optional) the name of the Public IP resource. This field is required unless 
+  - `public_ip_name`                  - (`string`, optional) the name of the Public IP resource. This field is required unless
                                         the variable `public_ip_ids` is used.
-  - `public_ip_resource_group_name`   - (`string`, optional) the name of the Resource Group hosting the Public IP resource. 
+  - `public_ip_resource_group_name`   - (`string`, optional) the name of the Resource Group hosting the Public IP resource.
                                         This is used only for sourced resources.
   - `public_ip_ids`                   - (`map`, optional) a map of IDs for public IP addresses. Each key represents a logical
-                                        identifier and the value is the resource ID of the public IP. 
+                                        identifier and the value is the resource ID of the public IP.
   - `egress_nat_ip_ids`               - (`map`, optional) a map of IDs for egress NAT public IP addresses. Each key represents
                                         a logical identifier and the value is the resource ID of the public IP.
   - `trusted_address_ranges`          - (`list`, optional) a list of public IP address ranges that will be treated as internal
                                         traffic by Cloud NGFW in addition to RFC 1918 private subnets. Each list entry has to be
                                         in a CIDR format.
+  - `dns_settings`                    - (`object`, optional) DNS settings for the firewall. When not specified, DNS proxy is
+                                        disabled. When specified, either `dns_servers` or `use_azure_dns` must be set, as an
+                                        empty `dns_settings` block enables the DNS proxy without any servers configured.
+                                        Contains the following properties:
+    - `dns_servers`                   - (`list(string)`, optional) a list of up to 2 custom DNS server IP addresses. Mutually
+                                        exclusive with `use_azure_dns`.
+    - `use_azure_dns`                 - (`bool`, optional, defaults to `null`) when set to `true`, Azure-provided DNS is used.
+                                        Must be left unset (not explicitly `false`) when `dns_servers` is used, since the
+                                        upstream provider's `ConflictsWith` validation treats an explicitly-set `false` as
+                                        conflicting with `dns_servers`. Mutually exclusive with `dns_servers`.
   - `destination_nats`                - (`map`, optional) defines one or more destination NAT configurations.
                                         Each object supports the following properties:
     - `destination_nat_name`          - (`string`, required) the name of the Destination NAT. Must be unique within this map.
     - `destination_nat_protocol`      - (`string`, required) the protocol for this Destination NAT. Possible values are `TCP` or
                                         `UDP`.
-    - `frontend_public_ip_address_id` - (`string`, optional) the ID referencing the public IP that receives the traffic. 
+    - `frontend_public_ip_address_id` - (`string`, optional) the ID referencing the public IP that receives the traffic.
                                         This is used only when the variable `public_ip_ids` is utilized.
     - `frontend_port`                 - (`number`, required) the port on which traffic will be received. Must be in the range
                                         from 1 to 65535.
@@ -142,6 +152,10 @@ variable "cloudngfw_config" {
     public_ip_ids                    = optional(map(string))
     egress_nat_ip_ids                = optional(map(string))
     trusted_address_ranges           = optional(list(string))
+    dns_settings = optional(object({
+      dns_servers   = optional(list(string))
+      use_azure_dns = optional(bool)
+    }))
     destination_nats = optional(map(object({
       destination_nat_name          = string
       destination_nat_protocol      = string
@@ -207,6 +221,37 @@ variable "cloudngfw_config" {
     ]))
     error_message = <<-EOF
     Each destination_nat `backend_port` property value must be between 1 and 65535.
+    EOF
+  }
+  validation { # dns_settings mutual exclusivity
+    condition = (
+      var.cloudngfw_config.dns_settings == null ||
+      !(var.cloudngfw_config.dns_settings.use_azure_dns == true &&
+      var.cloudngfw_config.dns_settings.dns_servers != null)
+    )
+    error_message = <<-EOF
+    In `dns_settings`, `dns_servers` and `use_azure_dns` are mutually exclusive.
+    EOF
+  }
+  validation { # dns_settings dns_servers length
+    condition = (
+      var.cloudngfw_config.dns_settings == null ||
+      var.cloudngfw_config.dns_settings.dns_servers == null ||
+      length(var.cloudngfw_config.dns_settings.dns_servers) <= 2
+    )
+    error_message = <<-EOF
+    `dns_settings.dns_servers` supports at most 2 IP addresses.
+    EOF
+  }
+  validation { # dns_settings not empty
+    condition = (
+      var.cloudngfw_config.dns_settings == null ||
+      var.cloudngfw_config.dns_settings.dns_servers != null ||
+      var.cloudngfw_config.dns_settings.use_azure_dns == true
+    )
+    error_message = <<-EOF
+    When `dns_settings` is specified, either `dns_servers` or `use_azure_dns` must be set; an empty `dns_settings` block
+    will enable the DNS proxy without any servers configured.
     EOF
   }
 }
